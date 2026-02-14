@@ -41,19 +41,19 @@ Claude (Sonnet 4.5 / Opus 4.6)
 
 ## GLM-5 Delegation Gate (MANDATORY)
 
-**STOP. Claude must run this checklist BEFORE writing code or documentation.**
+**STOP. Run this checklist BEFORE writing code or documentation. This applies to you AND to any Task sub-agents you spawn.**
 
-1. **Am I generating >50 lines of code?**
-   → Use `ask_glm5_pro`. Do NOT write it yourself. Do NOT spawn a Task sub-agent.
+1. **Am I (or my sub-agent) generating >50 lines of code?**
+   → Use `ask_glm5_pro` to generate the code, then write the output to disk.
 
-2. **Am I writing >300 words of analysis, docs, or summaries?**
-   → Use `ask_glm5`. Do NOT write it yourself.
+2. **Am I (or my sub-agent) writing >300 words of analysis, docs, or summaries?**
+   → Use `ask_glm5` to generate the content, then write the output to disk.
 
-3. **Am I about to spawn a Task sub-agent for code generation?**
-   → **PROHIBITED.** Use `ask_glm5_pro` instead. Task sub-agents are Claude instances and burn Anthropic tokens. Reserve Task agents ONLY for interactive debugging, iterative file exploration, or tasks requiring filesystem access that GLM-5 cannot do.
+3. **Task sub-agents MUST also use GLM-5.**
+   Sub-agents have access to all MCP tools including `ask_glm5_pro` and `ask_glm5`. When spawning a Task sub-agent, **explicitly instruct it to use GLM-5 for code generation and analysis** in the prompt. Sub-agents that generate >50 lines of code or >300 words of content themselves (without delegating to GLM-5) are violating this rule.
 
-4. **Pattern: GLM-5 generates → Claude writes to disk.**
-   Claude's role is orchestration + file I/O. GLM-5's role is content generation. If Claude is generating content itself, it is doing it wrong.
+4. **Pattern: GLM-5 generates → Claude/sub-agent writes to disk.**
+   Claude's role (parent or sub-agent) is orchestration + file I/O. GLM-5's role is content generation. Spawning parallel sub-agents is encouraged for speed — but each sub-agent must delegate heavy work to GLM-5, not do it themselves.
 
 **Violation of this gate wastes the user's Anthropic budget. There is no acceptable excuse.**
 
@@ -224,15 +224,15 @@ ask_glm5("Create a summary table of these invoices with vendor, amount, date, st
 - Even with Opus, delegate >300 word analysis
 - Even with Opus, delegate >50 line code generation
 - Even with Opus, use web_search + web_reader for research
-- **NEVER spawn Task sub-agents for code generation** — use ask_glm5_pro instead
+- Task sub-agents are allowed for parallelism — but **each must use GLM-5** for heavy work
 
 **Opus Optimization Strategy:**
 ```
 Opus = Architect & Coordinator
 GLM-5 = Heavy Computation Worker
-Task sub-agents = ONLY for interactive debugging / file exploration
+Task sub-agents = Parallel workers that MUST use GLM-5 for code/analysis
 
-Opus designs the solution → GLM-5 implements → Opus writes to disk
+Opus designs the solution → spawns parallel sub-agents → each sub-agent uses GLM-5 → writes to disk
 ```
 
 ## Consumption Optimization Rules
@@ -539,14 +539,14 @@ Bash("git add . && git commit")
 - Are you using web_reader before Claude processes content?
 - Are you letting Claude generate >50 line code blocks?
 - Are you using GLM-5 for multi-document synthesis?
-- Are you spawning Task sub-agents for code generation instead of using ask_glm5_pro?
+- Are Task sub-agents using GLM-5 for their heavy work (not generating code/content themselves)?
 
 **Optimization checklist:**
 - [ ] Analysis >300 words delegated to ask_glm5
 - [ ] Code >50 lines uses ask_glm5_pro
 - [ ] Research uses web_search → web_reader → ask_glm5
 - [ ] Documents parsed with parse_document before analysis
-- [ ] NO Task sub-agents used for code generation (use ask_glm5_pro)
+- [ ] Task sub-agents use GLM-5 for heavy work (not generating code/content themselves)
 - [ ] Claude only does orchestration + file ops
 
 ## Contributing
@@ -566,4 +566,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ---
 
-**Remember:** The goal is to reduce Claude consumption while maintaining quality. Delegate heavy work, keep Claude for coordination. Both Sonnet 4.5 and Opus 4.6 benefit from this approach. **Never use Task sub-agents for code generation — use ask_glm5_pro instead.**
+**Remember:** The goal is to reduce Claude consumption while maintaining quality. Delegate heavy work, keep Claude for coordination. Both Sonnet 4.5 and Opus 4.6 benefit from this approach. **Task sub-agents are encouraged for parallelism — but each must use GLM-5 for code generation and analysis, not do it themselves.**
