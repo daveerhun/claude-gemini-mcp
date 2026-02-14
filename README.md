@@ -148,26 +148,72 @@ Extract text from PDFs and images using GLM-OCR.
 
 ## 📊 Usage Strategy
 
-### Hybrid Approach (Recommended)
+### Execution Priority (follow this order)
 
-**Use Claude Sonnet 4.5** as your default model for:
-- Orchestration and planning
-- File operations and code editing
-- Tool coordination
-- Quick responses
+When Claude faces a task, it should follow this priority chain:
 
-**Delegate to GLM-5** for:
-- Complex analysis (>500 words output)
-- Deep technical problems
-- Research synthesis
-- Code generation (>100 lines)
+| Priority | Action | When |
+|----------|--------|------|
+| 1 (FIRST) | **Spawn parallel sub-agents** | Multi-part tasks with independent pieces. Each sub-agent uses GLM-5 for heavy work |
+| 2 (SECOND) | **Delegate to GLM-5 directly** | Single-unit tasks that can't be parallelized (>50 lines code → `ask_glm5_pro`, >300 words → `ask_glm5`) |
+| 3 (LAST RESORT) | **Claude does it itself** | Only orchestration, file I/O, client polish, responses <100 words |
 
-**Example workflow:**
+### Sub-Agent Enforcement
+
+Task sub-agents spawned by Claude **MUST also use GLM-5** for their heavy work. When spawning a sub-agent, explicitly instruct it to use `ask_glm5_pro` for code generation and `ask_glm5` for analysis/docs. Sub-agents that generate >50 lines of code or >300 words of content themselves (without delegating to GLM-5) are violating the delegation model.
+
+**Pattern:** GLM-5 generates → Claude/sub-agent writes to disk.
+
+### Orchestration Model
+
+```
+Claude / Opus (Parent)
+    ├── Planning & coordination (stays in Claude)
+    ├── File operations & disk I/O (stays in Claude)
+    ├── Quick responses <100 words (stays in Claude)
+    │
+    ├── PRIORITY 1: Spawn parallel sub-agents (for multi-part tasks)
+    │    └── Each sub-agent uses GLM-5 for code/analysis
+    │         ├── ask_glm5_pro for code generation
+    │         ├── ask_glm5 for analysis/docs
+    │         └── Sub-agent writes output to disk
+    │
+    └── PRIORITY 2: Delegate to GLM-5 directly (for single-unit tasks)
+         ├── Analysis >300 words
+         ├── Code generation >50 lines
+         ├── Research synthesis from multiple sources
+         └── Document processing & OCR
+```
+
+### Model-Specific Strategies
+
+**Sonnet 4.5** (default for most tasks):
+- Orchestration, file ops, disk I/O, quick responses
+- Delegate all analysis >300 words and code >50 lines to GLM-5
+- Result: 10x token reduction
+
+**Opus 4.6** (complex multi-step coordination):
+- Priority 1: Spawn parallel sub-agents (each uses GLM-5)
+- Priority 2: Delegate to GLM-5 directly
+- Priority 3 (last resort): Opus does it itself
+- Pattern: Opus = Architect, Sub-agents = Parallel workers, GLM-5 = Content engine
+- Result: 90%+ reduction in Opus consumption
+
+### Example Workflows
+
+**Research pipeline:**
 1. Start session with Sonnet 4.5
 2. Use `web_search` to find sources
-3. Use `web_reader` to fetch content
+3. Use `web_reader` to fetch content (parallel)
 4. Use `ask_glm5` to analyze and synthesize
 5. Sonnet formats and presents results
+
+**Multi-part task (Opus):**
+1. Opus analyzes task and identifies independent parts
+2. Spawns parallel sub-agents for each part
+3. Each sub-agent calls `ask_glm5` or `ask_glm5_pro`
+4. Each sub-agent writes output to disk
+5. Opus integrates results
 
 ### Expected Savings
 
