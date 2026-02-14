@@ -23,8 +23,8 @@ Claude (Sonnet 4.5 / Opus 4.6)
     ├─→ File Operations (stays in Claude)
     ├─→ Quick Responses (stays in Claude)
     └─→ Heavy Tasks → Delegate to GLM-5 via MCP
-         ├─→ Complex Analysis (>500 words)
-         ├─→ Code Generation (>100 lines)
+         ├─→ Complex Analysis (>300 words)
+         ├─→ Code Generation (>50 lines)
          ├─→ Research Synthesis
          ├─→ Deep Reasoning
          └─→ Document Processing
@@ -39,13 +39,33 @@ Claude (Sonnet 4.5 / Opus 4.6)
   - GLM-4.6V - Vision & OCR tasks
   - search-prime - Web search engine
 
+## GLM-5 Delegation Gate (MANDATORY)
+
+**STOP. Claude must run this checklist BEFORE writing code or documentation.**
+
+1. **Am I generating >50 lines of code?**
+   → Use `ask_glm5_pro`. Do NOT write it yourself. Do NOT spawn a Task sub-agent.
+
+2. **Am I writing >300 words of analysis, docs, or summaries?**
+   → Use `ask_glm5`. Do NOT write it yourself.
+
+3. **Am I about to spawn a Task sub-agent for code generation?**
+   → **PROHIBITED.** Use `ask_glm5_pro` instead. Task sub-agents are Claude instances and burn Anthropic tokens. Reserve Task agents ONLY for interactive debugging, iterative file exploration, or tasks requiring filesystem access that GLM-5 cannot do.
+
+4. **Pattern: GLM-5 generates → Claude writes to disk.**
+   Claude's role is orchestration + file I/O. GLM-5's role is content generation. If Claude is generating content itself, it is doing it wrong.
+
+**Violation of this gate wastes the user's Anthropic budget. There is no acceptable excuse.**
+
+---
+
 ## Tool Delegation Guidelines
 
 ### When to Use Each Tool
 
 #### `ask_glm5` - Complex Reasoning
 **ALWAYS delegate when:**
-- Analysis requires >500 words output
+- Analysis requires >300 words output
 - Multi-step logical reasoning chains
 - System design or architecture decisions
 - Strategic analysis or synthesis
@@ -67,7 +87,7 @@ key players, differentiation strategies, and growth projections."
 
 #### `ask_glm5_pro` - Code Generation
 **ALWAYS delegate when:**
-- Generating >100 lines of code
+- Generating >50 lines of code
 - Complex algorithms or data structures
 - Full component implementations
 - Refactoring large code sections
@@ -179,7 +199,7 @@ ask_glm5("Create a summary table of these invoices with vendor, amount, date, st
 - File operations (read, write, edit)
 - Git operations
 - Code navigation and search
-- Quick code fixes (<50 lines)
+- Quick code fixes (<50 lines, otherwise use ask_glm5_pro)
 
 ✅ **Orchestration and planning**
 - Breaking down user requests
@@ -201,16 +221,18 @@ ask_glm5("Create a summary table of these invoices with vendor, amount, date, st
 - Strategic architecture decisions
 
 ✅ **But still delegate heavy work to GLM-5**
-- Even with Opus, delegate >500 word analysis
-- Even with Opus, delegate >100 line code generation
+- Even with Opus, delegate >300 word analysis
+- Even with Opus, delegate >50 line code generation
 - Even with Opus, use web_search + web_reader for research
+- **NEVER spawn Task sub-agents for code generation** — use ask_glm5_pro instead
 
 **Opus Optimization Strategy:**
 ```
 Opus = Architect & Coordinator
 GLM-5 = Heavy Computation Worker
+Task sub-agents = ONLY for interactive debugging / file exploration
 
-Opus designs the solution → GLM-5 implements → Opus integrates
+Opus designs the solution → GLM-5 implements → Opus writes to disk
 ```
 
 ## Consumption Optimization Rules
@@ -515,14 +537,16 @@ Bash("git add . && git commit")
 **Audit your workflow:**
 - Are you delegating analysis tasks to GLM-5?
 - Are you using web_reader before Claude processes content?
-- Are you letting Claude generate >100 line code blocks?
+- Are you letting Claude generate >50 line code blocks?
 - Are you using GLM-5 for multi-document synthesis?
+- Are you spawning Task sub-agents for code generation instead of using ask_glm5_pro?
 
 **Optimization checklist:**
-- [ ] Heavy analysis delegated to ask_glm5
-- [ ] Code generation uses ask_glm5_pro
+- [ ] Analysis >300 words delegated to ask_glm5
+- [ ] Code >50 lines uses ask_glm5_pro
 - [ ] Research uses web_search → web_reader → ask_glm5
 - [ ] Documents parsed with parse_document before analysis
+- [ ] NO Task sub-agents used for code generation (use ask_glm5_pro)
 - [ ] Claude only does orchestration + file ops
 
 ## Contributing
@@ -542,4 +566,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ---
 
-**Remember:** The goal is to reduce Claude consumption while maintaining quality. Delegate heavy work, keep Claude for coordination. Both Sonnet 4.5 and Opus 4.6 benefit from this approach!
+**Remember:** The goal is to reduce Claude consumption while maintaining quality. Delegate heavy work, keep Claude for coordination. Both Sonnet 4.5 and Opus 4.6 benefit from this approach. **Never use Task sub-agents for code generation — use ask_glm5_pro instead.**
