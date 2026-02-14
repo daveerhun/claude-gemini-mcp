@@ -17,8 +17,9 @@
 
 **This MCP server gives you:**
 - **10x reduction** in Claude consumption (Opus 4.6 → Sonnet 4.5 + GLM-5 delegation)
+- **5x reduction** in Claude consumption (Opus 4.6 → Opus 4.6 + GLM-5 delegation)
 - **Continuous availability** - never blocked again
-- **Cost-effective scaling** - $40-60/month Z.ai vs. $100/month wasted on blockages
+- **Cost-effective scaling** - $40-60/month Z.ai vs. $100 to 200$ /month paid additional to claude to continue using
 - **18-30x ROI** on your Claude Pro subscription
 
 ## 🚀 Quick Start
