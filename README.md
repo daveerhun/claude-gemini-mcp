@@ -1,4 +1,4 @@
-# GLM-5 MCP Server
+# GLM-5 MCP Server for Claude Desktop
 
 **Reduce Claude Desktop consumption by 10x** by delegating heavy tasks to Z.ai's GLM-5 (744B parameter) model through the Model Context Protocol (MCP).
 
