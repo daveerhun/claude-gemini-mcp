@@ -18,15 +18,21 @@
 ```
 User Request
     ↓
-Claude (Sonnet 4.5 / Opus 4.6)
+Claude / Opus (Parent)
     ├─→ Planning & Coordination (stays in Claude)
     ├─→ File Operations (stays in Claude)
-    ├─→ Quick Responses (stays in Claude)
-    └─→ Heavy Tasks → Delegate to GLM-5 via MCP
+    ├─→ Quick Responses <100 words (stays in Claude)
+    │
+    ├─→ PRIORITY 1: Spawn parallel sub-agents (for multi-part tasks)
+    │    └─→ Each sub-agent uses GLM-5 for code/analysis
+    │         ├─→ ask_glm5_pro for code generation
+    │         ├─→ ask_glm5 for analysis/docs
+    │         └─→ Sub-agent writes output to disk
+    │
+    └─→ PRIORITY 2: Delegate to GLM-5 directly (for single-unit tasks)
          ├─→ Complex Analysis (>300 words)
          ├─→ Code Generation (>50 lines)
          ├─→ Research Synthesis
-         ├─→ Deep Reasoning
          └─→ Document Processing
 ```
 
@@ -43,6 +49,15 @@ Claude (Sonnet 4.5 / Opus 4.6)
 
 **STOP. Run this checklist BEFORE writing code or documentation. This applies to you AND to any Task sub-agents you spawn.**
 
+### Execution Priority (follow this order)
+
+**When facing a task with multiple independent parts:**
+1. **FIRST: Spawn parallel sub-agents** — each sub-agent uses GLM-5 for its heavy work. This is the fastest path and MUST be preferred over sequential GLM-5 calls.
+2. **SECOND: Delegate to GLM-5 directly** — when the task is a single unit that cannot be parallelized, use `ask_glm5` or `ask_glm5_pro`.
+3. **LAST RESORT: Do it yourself** — only for orchestration, file I/O, client polish, and responses <100 words. Opus/Claude should almost never generate content directly.
+
+### Pre-Flight Checks
+
 1. **Am I (or my sub-agent) generating >50 lines of code?**
    → Use `ask_glm5_pro` to generate the code, then write the output to disk.
 
@@ -53,7 +68,7 @@ Claude (Sonnet 4.5 / Opus 4.6)
    Sub-agents have access to all MCP tools including `ask_glm5_pro` and `ask_glm5`. When spawning a Task sub-agent, **explicitly instruct it to use GLM-5 for code generation and analysis** in the prompt. Sub-agents that generate >50 lines of code or >300 words of content themselves (without delegating to GLM-5) are violating this rule.
 
 4. **Pattern: GLM-5 generates → Claude/sub-agent writes to disk.**
-   Claude's role (parent or sub-agent) is orchestration + file I/O. GLM-5's role is content generation. Spawning parallel sub-agents is encouraged for speed — but each sub-agent must delegate heavy work to GLM-5, not do it themselves.
+   Claude's role (parent or sub-agent) is orchestration + file I/O. GLM-5's role is content generation.
 
 **Violation of this gate wastes the user's Anthropic budget. There is no acceptable excuse.**
 
@@ -220,19 +235,18 @@ ask_glm5("Create a summary table of these invoices with vendor, amount, date, st
 - Coordinating 5+ tool calls with dependencies
 - Strategic architecture decisions
 
-✅ **But still delegate heavy work to GLM-5**
-- Even with Opus, delegate >300 word analysis
-- Even with Opus, delegate >50 line code generation
-- Even with Opus, use web_search + web_reader for research
-- Task sub-agents are allowed for parallelism — but **each must use GLM-5** for heavy work
+✅ **Execution priority for Opus:**
+- **Priority 1:** Spawn parallel sub-agents for independent tasks (each sub-agent uses GLM-5)
+- **Priority 2:** Delegate to GLM-5 directly when task is single-unit
+- **Priority 3 (last resort):** Opus does it itself — only for orchestration, file I/O, <100 words
 
 **Opus Optimization Strategy:**
 ```
-Opus = Architect & Coordinator
-GLM-5 = Heavy Computation Worker
-Task sub-agents = Parallel workers that MUST use GLM-5 for code/analysis
+Opus = Architect & Coordinator (NEVER generates content directly)
+Sub-agents = Parallel workers (MUST use GLM-5 for heavy work)
+GLM-5 = Content engine (code, analysis, docs)
 
-Opus designs the solution → spawns parallel sub-agents → each sub-agent uses GLM-5 → writes to disk
+Parallelism FIRST → GLM-5 delegation SECOND → Opus self-execution LAST
 ```
 
 ## Consumption Optimization Rules
