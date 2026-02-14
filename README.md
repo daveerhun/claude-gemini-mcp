@@ -4,6 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-blue.svg)](https://modelcontextprotocol.io)
+[![GitHub stars](https://img.shields.io/github/stars/Arkya-AI/glm5-mcp?style=social)](https://github.com/Arkya-AI/glm5-mcp)
+[![GitHub release](https://img.shields.io/github/v/release/Arkya-AI/glm5-mcp)](https://github.com/Arkya-AI/glm5-mcp/releases)
 
 ## 🎯 Problem This Solves
 
@@ -32,7 +34,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/glm5-mcp.git
+git clone https://github.com/Arkya-AI/glm5-mcp.git
 cd glm5-mcp
 
 # Install dependencies
@@ -268,7 +270,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - [Model Context Protocol](https://modelcontextprotocol.io)
 - [Z.ai Documentation](https://docs.z.ai)
 - [Claude Desktop](https://claude.ai/download)
-- [Issue Tracker](https://github.com/yourusername/glm5-mcp/issues)
+- [Issue Tracker](https://github.com/Arkya-AI/glm5-mcp/issues)
+- [Discussions](https://github.com/Arkya-AI/glm5-mcp/discussions)
 
 ## 💡 Use Cases
 
