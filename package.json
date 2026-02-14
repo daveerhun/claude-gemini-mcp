@@ -1,0 +1,14 @@
+{
+  "name": "glm5-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for GLM-5 via Z.ai API",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "node-fetch": "^3.3.2"
+  }
+}
