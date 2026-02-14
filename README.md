@@ -210,8 +210,21 @@ The server will start in stdio mode and log to stderr. Use Claude Desktop to tes
 3. Update README documentation
 4. Test in Claude Desktop
 
-## 📖 API Documentation
+## 📖 Documentation
 
+### For Users
+- **[README.md](README.md)** - Setup and installation guide (you're here!)
+- **[EXAMPLES.md](EXAMPLES.md)** - Real-world usage examples
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
+
+### For Claude
+- **[CLAUDE.md](CLAUDE.md)** - **Comprehensive project memory and delegation guidelines**
+  - When to use each tool (Sonnet 4.5 vs Opus 4.6 strategies)
+  - Code quality standards and patterns
+  - Optimization rules to reduce Claude consumption
+  - Development workflow and troubleshooting
+
+### API Reference
 This MCP server uses the [Z.ai API](https://docs.z.ai). Key endpoints:
 
 - `/paas/v4/chat/completions` - GLM-5 text generation
