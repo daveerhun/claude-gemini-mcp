@@ -11,11 +11,11 @@
 
 ## The Problem: The "Claude Pro Wall"
 
-Claude Pro users paying $20/month frequently encounter a frustrating reality:
+Claude Pro users paying $20/month and even those paying $ 100 per month frequently encounter a frustrating reality:
 
 ### The 28% Availability Math
 
-Most power users exhaust their weekly message limits in approximately **2 days**. This leaves them blocked for the remaining 5 days of the week. You are effectively paying for a service that is unavailable **71% of the time** -- $20/month for 28% availability. This creates a scarcity mindset where users hesitate to use Claude for complex tasks, fearing they will run out of messages before the week resets.
+Most power users exhaust their weekly message limits in approximately **2 days**. This leaves them blocked for the remaining 5 days of the week. You are effectively paying for a service that is unavailable **71% of the time** -- $100/month for 28% availability unable to do heavy work. This creates a scarcity mindset where users hesitate to use Claude for complex tasks, fearing they will run out of limits before the week resets.
 
 ### The Sonnet 4.5 Degradation
 
@@ -27,7 +27,7 @@ This MCP approach specifically helps Sonnet 4.5 users by **offloading heavy anal
 
 **Opus 4.6** remains the gold standard for intelligence, but its consumption rate is punishing -- **3-5x higher** than Sonnet. On the Pro plan, using Opus for documentation reading, boilerplate generation, or routine analysis burns through your weekly allocation at an alarming rate.
 
-By delegating heavy work to external models, you get **Opus-quality orchestration** with **90%+ reduction in consumption**.
+By delegating heavy work to external models, you get **Opus-quality orchestration** and **Parallel Agents** with **80% to 90%+ reduction in consumption**.
 
 ---
 
@@ -40,7 +40,7 @@ By delegating heavy work to external models, you get **Opus-quality orchestratio
 | User Type | Benefit | Improvement |
 |:---|:---|:---|
 | **Sonnet 4.5** | Superior output quality via offloading | **10x** consumption reduction |
-| **Opus 4.6** | Cost control with full capability | **90%+** consumption reduction |
+| **Opus 4.6** | Cost control with full capability | **80%+** consumption reduction |
 | **All Users** | Extended Pro subscription value | **18-30x** ROI |
 
 ---
