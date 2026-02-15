@@ -1,358 +1,193 @@
-# GLM-5 MCP Usage Examples
+# 🚀 MCP Server Examples: GLM-5 & Gemini 3.x
 
-Real-world examples of how to use GLM-5 MCP tools to reduce Claude consumption and extend your capabilities.
-
-## 🎯 Quick Reference
-
-| Task | Tools Used | Time Saved |
-|------|------------|------------|
-| Competitive Analysis | web_search → web_reader → ask_glm5 | 15-30 min |
-| Document Analysis | parse_document → ask_glm5 | 10-15 min |
-| Research Synthesis | web_search → ask_glm5 | 20-40 min |
-| Code Generation | ask_glm5_pro | 5-10 min |
+This guide provides real-world scenarios and implementation patterns for using the GLM-5 (Z.ai) and Gemini 3.x (Google) MCP servers within Claude Desktop. By offloading heavy reasoning, massive web searches, and long-document processing to these external models, you preserve Claude's context window and reduce token costs.
 
 ---
 
-## Example 1: Competitive Intelligence
+## 📊 Quick Reference
 
-**Goal:** Analyze a competitor's new product launch
-
-**Conversation with Claude:**
-
-```
-You: "Research competitor X's new AI product launched this month"
-
-Claude: Let me search for recent information about this.
-[Uses web_search with oneMonth filter]
-
-Claude: I found 12 relevant articles. Let me read the key ones.
-[Uses web_reader on top 3 results]
-
-Claude: Now I'll analyze their strategy and positioning.
-[Uses ask_glm5 with synthesis prompt]
-
-Claude: Here's my analysis...
-```
-
-**Behind the scenes:**
-1. `web_search` finds recent announcements
-2. `web_reader` extracts full article content
-3. `ask_glm5` performs deep analysis
-4. Claude (Sonnet) orchestrates and presents
-
-**Claude consumption:** ~500 tokens (orchestration only)
-**GLM-5 consumption:** ~2000 tokens (heavy analysis)
+| Task | GLM-5 Tools | Gemini Tools | Time Saved |
+| :--- | :--- | :--- | :--- |
+| **Deep Research** | `glm_web_search`, `ask_glm` | `gemini_search`, `ask_gemini` | ~15 mins |
+| **Contract Review** | `parse_document`, `ask_glm` | `parse_document`, `ask_gemini_pro` | ~30 mins |
+| **Code Generation** | `ask_glm_pro` | `ask_gemini_pro` | ~10 mins |
+| **Market Synthesis** | `glm_web_reader`, `ask_glm` | `gemini_web_reader`, `ask_gemini` | ~45 mins |
+| **Multi-PDF Compare**| `parse_document`, `ask_glm` | `parse_document`, `ask_gemini` | ~1 hour |
 
 ---
 
-## Example 2: PDF Contract Review
+## 🔍 Section 1: Competitive Intelligence
+*Analyze a competitor's recent product launch by searching the web and synthesizing findings.*
 
-**Goal:** Extract key terms from a legal contract
+### GLM-5 Implementation
+**Claude Prompt:** "Search for the latest press releases from [Competitor X] regarding their new 'Cloud-Native' engine. Read the top 3 articles and use GLM-5 to summarize their technical advantages over our current stack."
 
-**Conversation:**
+**Tool Sequence:**
+1. `glm_web_search(query="Competitor X Cloud-Native engine press release")`
+2. `glm_web_reader(urls=["url_1", "url_2", "url_3"])`
+3. `ask_glm(prompt="Based on these articles: [content], what are the 5 key technical advantages?")`
 
-```
-You: "Review this contract and list key obligations, risks, and dates"
-     [Provides PDF URL]
+### Gemini Implementation
+**Claude Prompt:** "Find the technical specs for [Competitor X]'s new engine using Gemini search. Have Gemini Pro analyze the architectural differences compared to industry standards."
 
-Claude: I'll parse the document first.
-[Uses parse_document]
-
-Claude: Now analyzing the extracted content...
-[Uses ask_glm5 with legal analysis prompt]
-
-Claude: Here are the key findings:
-- Obligations: [list]
-- Risks: [list]
-- Important dates: [list]
-```
-
-**Tools used:**
-1. `parse_document("https://example.com/contract.pdf")`
-2. `ask_glm5("Analyze this contract...")`
-
-**Why this works:**
-- GLM-OCR handles complex PDF layouts
-- GLM-5 does the heavy legal analysis
-- Claude presents structured findings
+**Tool Sequence:**
+1. `gemini_search(query="technical specifications Competitor X Cloud-Native engine")`
+2. `gemini_web_reader(urls=["url_1", "url_2"])`
+3. `ask_gemini_pro(prompt="Analyze the architecture described here: [content]. Compare to standard Kubernetes-native patterns.")`
 
 ---
 
-## Example 3: Market Research Report
+## 📄 Section 2: PDF Contract Review
+*Reviewing a 50-page Master Service Agreement (MSA) for liability risks.*
 
-**Goal:** Create an executive summary of AI agent market trends
+### GLM-5 Implementation
+**Tool Sequence:**
+1. `parse_document(path="path/to/MSA_Draft.pdf")`
+2. `ask_glm(prompt="Review the 'Limitation of Liability' and 'Indemnification' sections in the following text: [parsed_text]. Identify any clauses that deviate from standard enterprise norms.")`
 
-**Conversation:**
-
-```
-You: "Create a market analysis report on AI agents - trends, key players,
-      market size, growth projections"
-
-Claude: I'll search for comprehensive market data.
-[Uses web_search with count=50]
-
-Claude: Reading detailed reports from Gartner, McKinsey, and industry sites.
-[Uses web_reader on 10 key sources]
-
-Claude: Synthesizing findings into executive summary...
-[Uses ask_glm5 with 5000+ word synthesis]
-
-Claude: Here's your report:
-# AI Agent Market Analysis 2024
-[Comprehensive report with data, trends, projections]
-```
-
-**Claude consumption:** ~1000 tokens
-**GLM-5 consumption:** ~5000 tokens
-**Savings:** 80% reduction vs. Claude doing everything
+### Gemini Implementation
+**Tool Sequence:**
+1. `parse_document(path="path/to/MSA_Draft.pdf")`
+2. `ask_gemini_pro(prompt="Act as a senior legal counsel. Extract all termination triggers from this document: [parsed_text]. Present them in a risk-matrix table.")`
 
 ---
 
-## Example 4: Code Generation
+## 📈 Section 3: Market Research Report
+*High-volume data gathering and synthesis across dozens of sources.*
 
-**Goal:** Build a React authentication component
+### GLM-5 Implementation
+**Claude Prompt:** "Perform a deep dive into the 2024 EV charging infrastructure market in Southeast Asia. Search at least 50 sources."
 
-**Conversation:**
+**Tool Sequence:**
+1. `glm_web_search(query="EV charging infrastructure SE Asia 2024 trends", count=50)`
+2. `glm_web_reader(urls=[...], parallel=true)`
+3. `ask_glm(prompt="Synthesize these 50 sources into a market report covering: 1. CAGR, 2. Key Players, 3. Regulatory hurdles.")`
 
-```
-You: "Build a React component for OAuth authentication with Google and GitHub"
+### Gemini Implementation
+**Claude Prompt:** "Use Gemini to scrape the latest 50 news entries for 'Quantum Computing Commercialization'. Summarize the state of the industry."
 
-Claude: I'll generate the implementation.
-[Uses ask_glm5_pro with detailed spec]
-
-Claude: Here's the component:
-[Integrates GLM-5's code into project]
-
-Claude: I've added it to your auth/ directory. Would you like me to add tests?
-```
-
-**Tools used:**
-1. `ask_glm5_pro("Create a React OAuth component...")`
-2. Claude (Sonnet) integrates and tests
-
-**Why delegate to GLM-5:**
-- Code generation is token-heavy
-- GLM-5 Pro optimized for coding
-- Claude handles file operations
+**Tool Sequence:**
+1. `gemini_search(query="Quantum computing commercialization news 2024", count=50)`
+2. `gemini_web_reader(urls=[...])`
+3. `ask_gemini(prompt="Process these reports and provide a timeline of expected commercial milestones for the next 5 years.")`
 
 ---
 
-## Example 5: Multi-Source Research
+## 💻 Section 4: Code Generation
+*Generating complex, boilerplate-heavy React components with state management.*
 
-**Goal:** Compare pricing strategies across competitors
+### GLM-5 Implementation
+**Claude Prompt:** "I need a complex React dashboard component for real-time telemetry. Ask GLM-5 Pro to generate the full code using Tailwind CSS and Framer Motion."
 
-**Conversation:**
+**Tool Call:**
+`ask_glm_pro(prompt="Generate a React component 'TelemetryDashboard'. It should include: 1. A responsive grid. 2. Recharts for live data. 3. Dark mode support. 4. Strict TypeScript types.")`
 
-```
-You: "Compare pricing models of Anthropic, OpenAI, and Google for LLM APIs"
+### Gemini Implementation
+**Claude Prompt:** "Have Gemini Pro write a high-performance Node.js streaming service for processing large JSON files."
 
-Claude: Searching for current pricing pages...
-[Uses web_search for each company + "pricing api"]
-
-Claude: Fetching pricing details...
-[Uses web_reader on 3 pricing pages]
-
-Claude: Analyzing pricing strategies and competitive positioning...
-[Uses ask_glm5 with competitive analysis prompt]
-
-Claude: Here's the comparison:
-[Table with pricing, features, positioning analysis]
-```
-
-**Workflow:**
-1. `web_search("Anthropic API pricing 2024")`
-2. `web_search("OpenAI API pricing 2024")`
-3. `web_search("Google Gemini API pricing 2024")`
-4. `web_reader(url)` for each result
-5. `ask_glm5("Compare these pricing strategies...")`
+**Tool Call:**
+`ask_gemini_pro(prompt="Write a Node.js script using the 'stream' API to parse a 10GB JSON file, filter by 'status: error', and write to a CSV. Optimize for low memory footprint.")`
 
 ---
 
-## Example 6: Document Translation + Analysis
+## 🌐 Section 5: Multi-Source Research
+*Synthesizing information from disparate formats (Web + PDF).*
 
-**Goal:** Analyze a competitor's Japanese product docs
+### Both Integrations (Hybrid)
+**Claude Prompt:** "Search for the latest 'Global Energy Outlook' PDF and also search for recent news articles about 'Green Hydrogen' subsidies in the EU. Use the model to compare the PDF's predictions with current news."
 
-**Conversation:**
-
-```
-You: "Analyze this Japanese product documentation"
-     [Provides URL to Japanese PDF]
-
-Claude: First, I'll extract the text.
-[Uses parse_document]
-
-Claude: The document is in Japanese. I'll analyze it directly.
-[Uses ask_glm5 with multilingual analysis]
-
-Claude: Here's what I found:
-- Key features: [list]
-- Technical architecture: [description]
-- Competitive advantages: [analysis]
-```
-
-**Note:** GLM-5 has multilingual capabilities, so you can analyze content in various languages without explicit translation.
+**Sequence:**
+1. `glm_web_search(query="Global Energy Outlook 2024 filetype:pdf")`
+2. `parse_document(path="downloaded_outlook.pdf")`
+3. `gemini_search(query="EU green hydrogen subsidies news 2024")`
+4. `ask_gemini_pro(prompt="Compare the projections in [PDF_DATA] with the reality of subsidies in [NEWS_DATA]. Are we on track?")`
 
 ---
 
-## Example 7: Data Synthesis from Multiple PDFs
+## ⚡ Section 6: Parallel Execution (Gemini-Specific)
+*Claude acts as an orchestrator, spawning sub-agents to handle a multi-part project simultaneously.*
 
-**Goal:** Compare features across 3 competitor whitepapers
+**Scenario:** A comprehensive "Investment Memo" for a tech startup.
 
-**Conversation:**
+**Claude's Internal Execution Logic:**
+1. **Sub-agent A (Executive Summary):**
+   - `ask_gemini(prompt="Draft an executive summary based on the provided pitch deck text.")`
+2. **Sub-agent B (Technical Audit):**
+   - `ask_gemini_pro(prompt="Review the provided GitHub repo snippets. Identify potential scaling bottlenecks.")`
+3. **Sub-agent C (Market Context):**
+   - `gemini_search(query="Competitor landscape for [Startup Sector]")`
+   - `gemini_web_reader(...)`
+   - `ask_gemini(prompt="Summarize the competitive threats.")`
 
-```
-You: "Compare technical approaches in these 3 whitepapers"
-     [Provides 3 PDF URLs]
-
-Claude: Parsing all three documents...
-[Uses parse_document 3 times in parallel]
-
-Claude: Analyzing and comparing approaches...
-[Uses ask_glm5 with comparison framework]
-
-Claude: Here's the feature comparison matrix:
-[Detailed comparison table]
-```
-
-**Advanced tip:** Claude can coordinate multiple tool calls in parallel for efficiency.
+**Result:** Claude receives all three responses simultaneously.
+**Token Savings:** Instead of Claude reading 50 pages of research, it only receives the three 500-word summaries, saving ~15,000 tokens in its primary context window.
 
 ---
 
-## Example 8: Ongoing Research Assistant
+## 🌍 Section 7: Document Translation + Analysis
+*Processing foreign language technical documentation.*
 
-**Goal:** Daily competitive monitoring
+**Claude Prompt:** "I have a technical manual in Japanese (PDF). Use GLM-5 to translate the 'Safety Protocols' section and then explain the maintenance schedule to me in English."
 
-**Conversation:**
+**Tool Sequence:**
+1. `parse_document(path="manual_jp.pdf")`
+2. `ask_glm(prompt="Translate the following Japanese technical text to English, focusing on safety: [text]")`
+3. `ask_glm(prompt="Based on the translation, create a weekly maintenance checklist.")`
 
-```
-You: "Check for any news about competitor X from the past day"
+---
 
-Claude: Searching recent news...
-[Uses web_search with search_recency_filter: "oneDay"]
+## 📂 Section 8: Data Synthesis from Multiple PDFs
+*Comparing quarterly earnings across three different companies.*
 
-Claude: Found 2 announcements. Reading details...
-[Uses web_reader]
+**Claude Prompt:** "Analyze the Q3 earnings PDFs for Company A, B, and C. Identify which company has the best debt-to-equity ratio improvement."
 
-Claude: Here's what's new:
-1. [Summary of announcement 1]
-2. [Summary of announcement 2]
-
-Would you like me to analyze the implications?
-```
-
-**Automation potential:** You could run this daily to stay updated.
+**Tool Sequence:**
+1. `parse_document(path="company_a_q3.pdf")`
+2. `parse_document(path="company_b_q3.pdf")`
+3. `parse_document(path="company_c_q3.pdf")`
+4. `ask_gemini_pro(prompt="Extract the debt-to-equity ratios for these three companies: [Data A, B, C]. Compare them and rank them.")`
 
 ---
 
 ## 💡 Best Practices
 
-### When to Delegate to GLM-5
+### When to Delegate to External Models
+*   **Context Volume:** If the source material is >5,000 words, delegate the reading to GLM or Gemini.
+*   **Specialized Reasoning:** Use GLM-5 for complex logical puzzles or bilingual (CN/EN) tasks.
+*   **Heavy Lifting:** Use Gemini Pro for massive code generation or 1M+ token context windows.
 
-**Always delegate:**
-- Analysis >500 words
-- Code generation >100 lines
-- Multi-document synthesis
-- Complex reasoning chains
-- Deep technical explanations
+### Keep in Claude
+*   **File Operations:** Use Claude's native capabilities for local file moving/renaming.
+*   **Final Orchestration:** Let Claude be the "Editor-in-Chief" who assembles the outputs from external models.
+*   **Quick Q&A:** If the answer is in the current chat history, don't waste an external API call.
 
-**Keep in Claude (Sonnet):**
-- File operations
-- Quick Q&A
-- Tool coordination
-- Response formatting
-- Context maintenance
-
-### Prompt Engineering for GLM-5
-
-**Good prompts:**
-```javascript
-ask_glm5({
-  prompt: "Analyze the competitive positioning of Product X vs Y. Focus on: 1) Target market, 2) Pricing strategy, 3) Technical differentiation, 4) Go-to-market approach. Use the following data: [data]",
-  temperature: 0.3 // Lower for analytical tasks
-})
-```
-
-**Less effective:**
-```javascript
-ask_glm5({
-  prompt: "Compare products", // Too vague
-  temperature: 1.0 // Too random for analysis
-})
-```
-
-### Chaining Tools Effectively
-
-**Efficient workflow:**
-1. Sonnet plans the research strategy
-2. `web_search` finds sources
-3. `web_reader` extracts content (parallel if possible)
-4. `ask_glm5` synthesizes findings
-5. Sonnet formats and presents
-
-**Inefficient workflow:**
-1. Claude searches and reads everything (high token usage)
-2. Claude does analysis (even higher usage)
-3. Hit rate limits quickly
+### Prompt Engineering Tips
+*   **Be Explicit:** When calling `ask_gemini` or `ask_glm`, include the context in the prompt: `"Using the text provided below, do X..."`
+*   **Format Constraints:** Ask for JSON or Markdown in the tool prompt to make it easier for Claude to parse the result.
 
 ---
 
-## 📊 ROI Calculator
+## 💰 ROI Calculator (Hypothetical)
 
-**Traditional approach (Claude Opus 4.6 only):**
-- Competitive analysis: ~8000 tokens
-- Document review: ~6000 tokens
-- Research synthesis: ~12000 tokens
-- **Total:** 26000 tokens
-- **Claude Pro limit:** ~100,000 tokens/week
-- **Days to limit:** ~2 days
-
-**Hybrid approach (Sonnet + GLM-5):**
-- Claude orchestration: ~3000 tokens total
-- GLM-5 analysis: ~20000 tokens (Z.ai credits)
-- **Claude consumption:** 3000 tokens
-- **Days to limit:** 20+ days
-
-**Savings:** 10x more work from same Claude Pro subscription
+| Feature | Without MCP | With GLM/Gemini MCP | Benefit |
+| :--- | :--- | :--- | :--- |
+| **Claude Context Usage** | 100% (High Cost) | 15-20% (Low Cost) | **80% Token Savings** |
+| **Processing Speed** | Sequential | Parallel (Sub-agents) | **3x Faster Delivery** |
+| **Research Depth** | Limited to 5-10 URLs | Up to 50+ URLs | **Higher Accuracy** |
+| **Document Size** | Max 30MB / Context Limit | Up to 2GB (Gemini) | **Unlimited Scale** |
 
 ---
 
-## 🚀 Advanced Patterns
+## 🛠 Advanced Patterns
 
-### Pattern 1: Recursive Research
-```
-1. web_search (broad query)
-2. ask_glm5 ("identify knowledge gaps")
-3. web_search (targeted queries based on gaps)
-4. web_reader (deep dive on specific sources)
-5. ask_glm5 (final synthesis)
-```
+### 1. Recursive Research
+Claude uses `glm_web_search` to find a topic, calls `glm_web_reader`, finds a *new* keyword in that text, and automatically triggers a second search before presenting the final answer.
 
-### Pattern 2: Comparative Analysis Pipeline
-```
-For each competitor:
-  1. web_search (company + topic)
-  2. web_reader (top 3 results)
-  3. Store findings
+### 2. Comparative Analysis Pipeline
+Claude sends the same prompt to *both* `ask_glm` and `ask_gemini_pro`, then compares their answers to find discrepancies or hallucinations.
 
-ask_glm5 (synthesize all findings into comparison)
-```
+### 3. Document Processing Workflow
+1. `parse_document` -> 2. `ask_glm` (Summary) -> 3. `ask_gemini` (Action Items) -> 4. Claude (Email Draft).
 
-### Pattern 3: Document Processing Workflow
-```
-1. parse_document (extract text)
-2. ask_glm5 (identify key sections)
-3. ask_glm5_pro (generate summary code/structure)
-4. Sonnet (integrate into project)
-```
-
----
-
-## 🎓 Learning Resources
-
-- [MCP Best Practices](https://modelcontextprotocol.io/docs)
-- [Z.ai Model Guide](https://docs.z.ai)
-- [Prompt Engineering Guide](https://www.promptingguide.ai)
-
----
-
-**Have a great example?** Submit a PR to add it here!
+### 4. Parallel Sub-Agent Orchestration
+Claude breaks a complex prompt (e.g., "Build a business plan") into four tool calls. It executes them in one turn, gathering market data, financial projections, and SWOT analysis from the external models simultaneously.

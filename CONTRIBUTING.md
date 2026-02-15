@@ -1,11 +1,11 @@
-# Contributing to GLM-5 MCP Server
+# Contributing to Claude Additional Models MCP
 
 Thank you for your interest in contributing! This document provides guidelines for contributing to the project.
 
 ## 🎯 Project Goals
 
 1. **Reduce Claude consumption** - Help users get more value from their Claude Pro subscriptions
-2. **Seamless integration** - Make GLM-5 feel native to Claude Desktop
+2. **Multi-provider support** - Integrate multiple external AI models (GLM-5, Gemini, and future providers) with Claude Desktop
 3. **Reliability** - Tools should work consistently and handle errors gracefully
 4. **Simplicity** - Keep the codebase simple and maintainable
 
@@ -15,21 +15,23 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 - Node.js 18+ installed
 - Claude Desktop installed
-- Z.ai API key for testing
+- API key for the integration you want to test:
+  - **GLM-5:** the relevant API key from [z.ai](https://z.ai)
+  - **Gemini:** Google API key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey) (free tier available)
 
 ### Development Setup
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/glm5-mcp.git
-cd glm5-mcp
+git clone https://github.com/YOUR_USERNAME/claude-additional-models-mcp.git
+cd claude-additional-models-mcp
 
 # Install dependencies
 npm install
 
 # Create a test config
 cp claude_desktop_config.example.json claude_desktop_config.json
-# Edit and add your Z.ai API key
+# Edit and add your the relevant API key
 
 # Test the server
 npm start
@@ -260,7 +262,7 @@ web_search({ count: 1000 }) // Should validate
 ### Step-by-Step Guide
 
 1. **Research the API**
-   - Read Z.ai documentation
+   - Read the provider's API documentation (Z.ai docs, Google AI docs, etc.)
    - Test API with curl/Postman
    - Understand response format
 
@@ -314,14 +316,22 @@ web_search({ count: 1000 }) // Should validate
    - Screenshots of testing
    - Updated documentation
 
-### Example: Adding Translation Tool
+### Adding a New Provider Integration
 
-See issue #X for full discussion and implementation guide.
+To add support for a new AI model provider (e.g., DeepSeek, Mistral):
+
+1. Create a new directory: `provider-name/`
+2. Add `index.js` and `package.json` following the existing pattern
+3. Implement the same 5 tool interfaces: `ask_[model]`, `ask_[model]_pro`, `web_search`, `web_reader`, `parse_document`
+4. Add a `CLAUDE.md` with provider-specific delegation guidelines
+5. Update the root README with setup instructions
+6. Submit a PR with testing evidence
 
 ## 📚 Resources
 
 - [MCP Specification](https://modelcontextprotocol.io)
-- [Z.ai API Docs](https://docs.z.ai)
+- [Z.ai API Docs](https://docs.z.ai) (GLM-5 integration)
+- [Google AI Studio](https://aistudio.google.com) (Gemini integration)
 - [Claude Desktop](https://claude.ai/download)
 - [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
 
