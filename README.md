@@ -401,10 +401,10 @@ claude-additional-models-mcp/
 ├── gemini/
 │   ├── index.js          # Gemini 3.x MCP server (hybrid API approach)
 │   └── package.json      # Gemini dependencies (@modelcontextprotocol/sdk, openai)
-├── CLAUDE.md             # Project memory & delegation enforcement rules
+├── CLAUDE.md             # GLM-5 delegation rules (root-level)
+├── gemini/CLAUDE.md      # Gemini delegation rules
 ├── EXAMPLES.md           # Real-world usage examples and templates
 ├── CONTRIBUTING.md       # Contribution guidelines
-├── PUBLISH_TO_GITHUB.md  # Publishing instructions
 ├── LICENSE               # MIT License
 ├── .github/              # GitHub issue/PR templates
 └── .gitignore
